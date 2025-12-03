@@ -1,0 +1,5 @@
+{
+  "title_ko": "전자 기기 사운드에 대한 향수",
+  "summary_ko": "이 기사는 토요일 밤 라이브 쇼에 출연한 배우 Glen Powell이 연기한 스케치 "I Miss My Ex's Dad"에 대해 다룹니다. 이 스케치에서 Powell의 캐릭터는 딸의 전 남자친구를 그리워하며, 특히 스틸리 댄(Steely Dan)에 대한 이야기를 하지 않는 새로운 남자친구를 불편해합니다. 이 기사는 음악 취향과 전자기기 사운드에 대한 향수를 다루고 있습니다.",
+  "concept_names": ["Saturday Night Live", "Steely Dan", "Tube sounds"]
+}

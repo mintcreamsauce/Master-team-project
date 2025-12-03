@@ -1,0 +1,23 @@
+# 1. 환경 변수 (모든 .env* 파일 무시)
+# 이 한 줄이 frontend/.env, backend/.env.prod 등을 모두 처리합니다.
+*.env*
+
+# 2. 예외 처리 (Example 파일은 Git에 올려야 함)
+# 단, .example 파일은 다른 개발자들을 위해 Git에 포함(commit)시키는 것이 좋습니다.
+# 따라서 .env*를 모두 무시하되, .example 파일은 "무시하지 않도록" 예외 처리합니다.
+!*.env.example
+!*.env.*.example
+
+# 3. 프런트엔드 의존성
+# 폴더를 지정할 땐 끝에 /를 붙이는 것이 좋습니다.
+frontend/node_modules/
+
+# 4. 파이썬 캐시 및 가상 환경 (권장)
+__pycache__/
+*.pyc
+venv/
+.venv/
+
+# 5. OS별 임시 파일 (권장)
+.DS_Store
+Thumbs.db

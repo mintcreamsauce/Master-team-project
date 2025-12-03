@@ -1,0 +1,94 @@
+﻿version: '3.9'
+
+services:
+  backend:
+    build: .
+    container_name: foreigneye_backend
+    entrypoint: ./entrypoint.sh
+    command: gunicorn --reload -b 0.0.0.0:8000 "app:create_app()"
+    env_file:
+      - .env
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app # 코드 수정 시 자동 재시작(Live Reloading)
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+      neo4j:
+        condition: service_healthy
+    restart: unless-stopped
+    
+  celery-worker:
+    build: .
+    container_name: foreigneye_celery
+    # [M1 수정] app.extensions.celery_app를 바라보도록 수정
+    command: celery -A app.extensions.celery_app worker -l info
+    env_file:
+      - .env
+    volumes:
+      - .:/app # 코드 수정 시 자동 재시작(Live Reloading)을 위해 추가
+    depends_on:
+      - db
+      - redis
+      - neo4j
+    restart: unless-stopped
+
+  db:
+    image: mysql:8.0
+    container_name: foreigneye_db
+    environment:
+      MYSQL_DATABASE: foreigneye_db
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MYSQL_USER: foreigneye_user
+      MYSQL_PASSWORD: 1234
+    volumes:
+      - foreigneye_db_data:/var/lib/mysql
+    ports:
+      - "3307:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    restart: unless-stopped
+    command:
+      - --ssl=0
+      - --default-authentication-plugin=mysql_native_password
+
+  redis:
+    image: redis:7.2-alpine
+    container_name: foreigneye_redis
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
+
+  neo4j:
+    image: neo4j:5
+    container_name: foreigneye_neo4j
+    environment:
+      NEO4J_AUTH: ${NEO4J_USERNAME}/${NEO4J_PASSWORD}
+      NEO4J_PLUGINS: '["apoc"]'
+      NEO4J_dbms_security_procedures_unrestricted: 'apoc.*'
+    ports:
+      - "7474:7474"  # Neo4j Browser (웹 UI)
+      - "7687:7687"  # Bolt 프로토콜 (앱 연결)
+    volumes:
+      - foreigneye_neo4j_data:/data
+    healthcheck:
+      test: ["CMD-SHELL", "wget -O /dev/null -q http://localhost:7474 || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    restart: unless-stopped
+
+volumes:
+  foreigneye_db_data:
+  foreigneye_neo4j_data:
+
+networks:
+  app_network:

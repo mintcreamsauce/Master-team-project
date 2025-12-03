@@ -1,0 +1,45 @@
+"""
+ETL 파이프라인 패키지
+
+뉴스 데이터 추출(Extract), 변환(Transform), 적재(Load)를 처리합니다.
+"""
+import os
+import atexit
+
+from etl import neo4j_conn
+from etl.gnews_fetcher import GNewsFetcher
+from etl.web_scraper import WebScraper
+from etl.ai_analyzer import AIAnalyzer
+from etl.db_loader import DBLoader
+from etl.similarity_calculator import SimilarityCalculator
+from neo4j import GraphDatabase, Driver
+
+__all__ = [
+    'GNewsFetcher',
+    'WebScraper',
+    'AIAnalyzer',
+    'DBLoader',
+    'SimilarityCalculator',
+    'GraphDatabase',
+    'Driver'
+]
+
+class Neo4jConnection:
+    def __init__(self):
+        uri = os.getenv('NEO4J_URI')
+        user = os.getenv('NEO4J_USERNAME')
+        password = os.getenv('NEO4J_PASSWORD')
+        self.driver = GraphDatabase.driver(uri, auth=(user, password), max_connection_lifetime=300)  # 타임아웃 설정
+
+    def close(self):
+        self.driver.close()
+
+    def execute_query(self, query):
+        with self.driver.session() as session:
+            result = session.run(query)
+            return result
+
+# 앱 시작 시
+neo4j_conn = Neo4jConnection()
+atexit.register(neo4j_conn.close)
+# ...

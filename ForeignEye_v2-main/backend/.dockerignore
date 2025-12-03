@@ -1,0 +1,19 @@
+# Docker 빌드 컨텍스트에서 제외할 파일 및 폴더 목록
+# ... (이전 내용들) ...
+
+# 3. Git 및 OS 파일
+.git/
+.gitignore
+README.md
+
+# 4. 환경 변수 파일 (보안)
+.env
+.env.*
+*.env
+
+# 5. 기타 임시 파일
+*.log
+docker-compose.yml
+Dockerfile
+generate_keys.py
+# reset_db.py  <-- 이 줄을 삭제하거나, 이렇게 주석 처리(#)합니다.
